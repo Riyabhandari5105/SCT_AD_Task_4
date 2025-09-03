@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code Scanner & Generator</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background: #f4f6f9;
+    }
+    h1 { color: #333; }
+    #reader {
+      width: 300px;
+      margin: 20px auto;
+    }
+    .section {
+      background: white;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 400px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 90%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      cursor: pointer;
+      background: #007BFF;
+      color: white;
+      border: none;
+    }
+    button:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+
+  <h1>📷 QR Code Scanner & Generator</h1>
+
+  <!-- QR Code Scanner -->
+  <div class="section">
+    <h2>Scan QR Code</h2>
+    <div id="reader"></div>
+    <p><strong>Result:</strong> <span id="scan-result">None</span></p>
+  </div>
+
+  <!-- QR Code Generator -->
+  <div class="section">
+    <h2>Create QR Code</h2>
+    <input type="text" id="qr-input" placeholder="Enter text or URL">
+    <button onclick="generateQRCode()">Generate</button>
+    <div id="qrcode"></div>
+  </div>
+
+  <script>
+    // QR Code Scanner
+    function onScanSuccess(decodedText) {
+      document.getElementById("scan-result").innerText = decodedText;
+    }
+
+    function onScanFailure(error) {
+      // Ignore scanning errors
+    }
+
+    let html5QrCode = new Html5Qrcode("reader");
+    Html5Qrcode.getCameras().then(devices => {
+      if (devices && devices.length) {
+        html5QrCode.start(
+          { facingMode: "environment" }, // rear camera
+          { fps: 10, qrbox: { width: 250, height: 250 } },
+          onScanSuccess,
+          onScanFailure
+        );
+      }
+    }).catch(err => console.error(err));
+
+    // QR Code Generator
+    function generateQRCode() {
+      let qrText = document.getElementById("qr-input").value;
+      let qrContainer = document.getElementById("qrcode");
+      qrContainer.innerHTML = ""; // Clear previous QR
+      if (qrText.trim() !== "") {
+        new QRCode(qrContainer, {
+          text: qrText,
+          width: 200,
+          height: 200
+        });
+      } else {
+        alert("Please enter some text or URL!");
+      }
+    }
+  </script>
+
+</body>
+</html>
